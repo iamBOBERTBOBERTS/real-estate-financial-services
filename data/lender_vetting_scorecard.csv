@@ -1,0 +1,4 @@
+lender_name,nmls_id,partner_type,states,hard_file_appetite,manual_underwriting,dpa_compatibility,self_employed_flexibility,low_credit_tolerance,communication_speed,scenario_feedback,compliance_clarity,total_score,network_status,notes
+Example DPA-Friendly Broker,,Mortgage broker,AZ,18,12,15,8,8,8,8,4,81,Strong secondary partner,Replace with real lender after discovery
+Example Community Bank,,Community bank,AZ;OR,15,14,5,10,5,7,8,5,69,Niche partner,Replace with real lender after discovery
+Example Non-QM Lender,,Non-QM lender,National,17,3,0,15,3,8,9,4,59,Niche partner,Replace with real lender after discovery

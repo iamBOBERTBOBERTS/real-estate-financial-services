@@ -1,0 +1,5 @@
+lender_name,partner_type,states,products,min_credit_band,dti_flexibility,manual_underwriting,dpa_compatible,self_employed_fit,property_fit,notes,outcome_score
+Example Community Bank,Portfolio lender,AZ;OR,Portfolio;FHA,620-659,Medium,Yes,Maybe,Medium,SFR;Condo,Replace with real partner after outreach,
+Example DPA-Friendly Broker,Mortgage broker,AZ,FHA;VA;USDA;DPA,580-619,High,Yes,Yes,Medium,SFR,Replace with real partner after outreach,
+Example Non-QM Lender,Non-QM lender,National,Bank statement;DSCR;Asset-based,660+,Medium,No,No,High,SFR;Investment,Replace with real partner after outreach,
+Example Housing Agency,Housing agency,AZ,DPA;Counseling,N/A,N/A,N/A,Yes,N/A,N/A,Replace with real agency after outreach,

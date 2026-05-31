@@ -1,0 +1,5 @@
+partner_name,partner_type,market,contact_name,email,phone,fit_reason,status,next_action,notes
+Example Realtor Team,Realtor,AZ,,,,First-time buyer pipeline with financing fallout,Prospect,Request 3 stuck files,Replace with real target
+Example Builder Sales Office,Builder,AZ,,,,Buyer fallout from DPA and DTI,Prospect,Ask for fallout list review,Replace with real target
+Example Housing Agency,Housing agency,AZ,,,,DPA and counseling path support,Prospect,Confirm program fit,Replace with real target
+Example Credit Union,Credit union,AZ,,,,Portfolio and local relationship lending,Prospect,Run discovery questions,Replace with real target

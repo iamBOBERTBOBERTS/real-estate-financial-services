@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ApprovalPath OS</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="product-switcher" aria-label="App mode">
+      <button class="mode-btn active" id="buyerPortalMode" type="button">Buyer Portal</button>
+      <button class="mode-btn" id="adminWorkspaceMode" type="button">Admin Workspace</button>
+    </div>
+
+    <section class="buyer-portal" id="buyerPortal">
+      <header class="portal-hero">
+        <div class="portal-hero-copy">
+          <p class="eyebrow">ApprovalPath buyer portal</p>
+          <h1>Your next step after a stalled mortgage file.</h1>
+          <p>See what your team is reviewing, what information is safe to share, and what happens next. This portal organizes the file; it does not make a loan decision.</p>
+          <div class="portal-actions">
+            <button class="portal-primary" type="button" data-portal-scroll="portalStartForm">Start My Review</button>
+            <button class="portal-secondary" type="button" data-portal-scroll="portalStatusPanel">See My Status</button>
+          </div>
+        </div>
+        <div class="portal-visual" aria-label="Buyer progress preview">
+          <div class="portal-card-main">
+            <span>File path</span>
+            <strong id="portalHeroTier">Approval Sprint</strong>
+            <div class="portal-progress">
+              <i style="--step: 68%"></i>
+            </div>
+            <p id="portalHeroMove">Collect a few missing details, then route to the right review lane.</p>
+          </div>
+          <div class="portal-mini-row">
+            <div><span>Next check-in</span><strong id="portalHeroFollowUp">This week</strong></div>
+            <div><span>Safety</span><strong>No SSNs</strong></div>
+          </div>
+        </div>
+      </header>
+
+      <main class="portal-main">
+        <section class="portal-band">
+          <div class="portal-section-heading">
+            <p class="eyebrow">What you can do here</p>
+            <h2>A calm place for a complicated file.</h2>
+          </div>
+          <div class="portal-feature-grid">
+            <article>
+              <strong>1</strong>
+              <h3>Share the basics</h3>
+              <p>Tell us what happened, your timeline, and the broad categories blocking the file.</p>
+            </article>
+            <article>
+              <strong>2</strong>
+              <h3>Track the next move</h3>
+              <p>See the current stage, next action, and what the internal team is working on.</p>
+            </article>
+            <article>
+              <strong>3</strong>
+              <h3>Stay protected</h3>
+              <p>Use estimates only. Keep SSNs, bank accounts, full credit reports, tax returns, paystubs, and IDs out of this local version.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="portal-two-col">
+          <div class="portal-panel" id="portalStatusPanel">
+            <div class="portal-panel-head">
+              <div>
+                <p class="eyebrow">My file status</p>
+                <h2 id="portalBuyerName">Demo Buyer</h2>
+              </div>
+              <span class="portal-badge" id="portalStageBadge">In review</span>
+            </div>
+            <div class="portal-status-grid">
+              <div><span>Current path</span><strong id="portalRescueTier">Approval Sprint</strong></div>
+              <div><span>Main blocker</span><strong id="portalPrimaryBlocker">Documents</strong></div>
+              <div><span>Next action</span><strong id="portalNextAction">Complete the safe intake</strong></div>
+              <div><span>Follow-up</span><strong id="portalNextFollowUp">Not set yet</strong></div>
+            </div>
+            <div class="portal-timeline">
+              <div class="done"><span></span><p>Request received</p></div>
+              <div class="active"><span></span><p>File reviewed</p></div>
+              <div><span></span><p>Route selected</p></div>
+              <div><span></span><p>Partner handoff</p></div>
+            </div>
+          </div>
+
+          <form class="portal-panel portal-form" id="portalStartForm">
+            <p class="eyebrow">Start or update your review</p>
+            <h2>Tell us what happened.</h2>
+            <div class="portal-form-grid">
+              <label>Your Name<input name="name" required placeholder="Alex Johnson"></label>
+              <label>Email<input name="email" type="email" placeholder="alex@example.com"></label>
+              <label>Phone<input name="phone" type="tel" placeholder="555-123-4567"></label>
+              <label>Target City<input name="targetCity" placeholder="Phoenix"></label>
+              <label>Timeline
+                <select name="timeline">
+                  <option>Now</option>
+                  <option>30 days</option>
+                  <option>90 days</option>
+                  <option>6+ months</option>
+                </select>
+              </label>
+              <label>What stalled the file?
+                <select name="problem">
+                  <option>Not sure</option>
+                  <option>Credit score too low</option>
+                  <option>Too much debt / DTI too high</option>
+                  <option>Not enough cash to close</option>
+                  <option>Income could not be verified</option>
+                  <option>Missing documents</option>
+                </select>
+              </label>
+            </div>
+            <label>Plain Notes<textarea name="notes" rows="4" placeholder="Share the story in plain English. Please do not include SSNs, account numbers, or full document contents."></textarea></label>
+            <label class="portal-check"><input name="safeInfo" type="checkbox" required><span>I understand this local portal uses estimates and categories only.</span></label>
+            <button class="portal-primary" type="submit">Send Safe Intake</button>
+            <p class="portal-form-note" id="portalSubmitNote">Your request will appear in the admin workspace as a new buyer file.</p>
+          </form>
+        </section>
+
+        <section class="portal-band portal-safety">
+          <div>
+            <p class="eyebrow">Plain-language promise</p>
+            <h2>Organized, careful, and honest.</h2>
+          </div>
+          <div class="portal-safety-grid">
+            <p>No approval promises.</p>
+            <p>No rate, payment, or APR quotes.</p>
+            <p>No sensitive document uploads in this local version.</p>
+            <p>Licensed mortgage professionals handle formal loan terms and eligibility.</p>
+          </div>
+        </section>
+      </main>
+    </section>
+
+    <div class="shell admin-shell" id="adminApp" hidden>
+      <aside class="sidebar" aria-label="Primary navigation">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">AP</div>
+          <div>
+            <h1>ApprovalPath OS</h1>
+            <p>Admin Workspace</p>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="nav-item active" data-view="command">Home</button>
+          <button class="nav-item" data-view="import">Add Many Leads</button>
+          <button class="nav-item" data-view="intake">Add One Buyer</button>
+          <button class="nav-item" data-view="diagnosis">Review Buyer</button>
+          <button class="nav-item" data-view="queue">Work Files</button>
+          <button class="nav-item" data-view="lenders">Find Lenders</button>
+          <button class="nav-item" data-view="partners">Partners</button>
+          <button class="nav-item" data-view="consent">Permissions</button>
+          <button class="nav-item" data-view="audit">Audit Logs</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Hard-to-approve buyer workspace</p>
+            <h2 id="viewTitle">Command Center</h2>
+          </div>
+            <div class="actions">
+            <label class="role-switcher">Demo Role
+              <select id="currentRoleSelect"></select>
+            </label>
+            <button class="ghost-btn" id="exportBtn" type="button">Download Report</button>
+            <button class="ghost-btn" id="seedBtn" type="button">Reset Demo Data</button>
+            <button class="primary-btn" data-view-shortcut="intake" type="button">Add Buyer</button>
+          </div>
+        </header>
+
+        <section class="view active" id="commandView" aria-labelledby="viewTitle">
+          <div class="welcome-card">
+            <div>
+              <p class="eyebrow">Start here</p>
+              <h3>Move difficult buyers from “not approved” to a clear next step.</h3>
+              <p>This tool helps your team add buyer leads, see what is blocking approval, collect missing items, and prepare the file for the right lender or program.</p>
+            </div>
+            <div class="quick-actions">
+              <button class="primary-btn" data-view-shortcut="intake" type="button">Run Impossible File Scan</button>
+              <button class="primary-btn" data-view-shortcut="import" type="button">Add a Lead List</button>
+              <button class="ghost-btn" data-view-shortcut="queue" type="button">Work Existing Files</button>
+            </div>
+          </div>
+          <div class="step-grid">
+            <div class="step-card"><strong>1</strong><span>Add buyers one at a time or upload a list.</span></div>
+            <div class="step-card"><strong>2</strong><span>Open each file and complete the checklist.</span></div>
+            <div class="step-card"><strong>3</strong><span>Use lender fit to choose the best next route.</span></div>
+          </div>
+          <div class="metric-grid" id="metricGrid"></div>
+          <div class="dashboard-grid">
+            <section class="panel">
+              <h3>Pipeline Snapshot</h3>
+              <div class="mini-metric-grid" id="pipelineSnapshot"></div>
+            </section>
+            <section class="panel">
+              <h3>Top Blockers</h3>
+              <div class="mini-metric-grid" id="topBlockers"></div>
+            </section>
+            <section class="panel">
+              <h3>Top Lender Lanes</h3>
+              <div class="mini-metric-grid" id="topLenderLanes"></div>
+            </section>
+          </div>
+          <div class="toolbar">
+            <label>
+              Buyer Stage
+              <select id="stageFilter"></select>
+            </label>
+            <label>
+              Best Route
+              <select id="pathFilter"></select>
+            </label>
+            <label>
+              Find a Buyer
+              <input id="searchInput" type="search" placeholder="Search by name, partner, or issue">
+            </label>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Buyer</th>
+                  <th>Where They Are</th>
+                  <th>Difficulty</th>
+                  <th>Readiness</th>
+                  <th>Best Route</th>
+                  <th>Next Step</th>
+                  <th>Helper</th>
+                  <th>Open</th>
+                </tr>
+              </thead>
+              <tbody id="borrowerTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" id="importView" aria-labelledby="viewTitle">
+          <div class="split import-layout">
+            <div class="panel">
+              <h3>Add a List of Leads</h3>
+              <p class="muted">Use this when you have a spreadsheet, exported lead list, or folder of lead files. CSV and JSON files work best.</p>
+              <div class="help-box">
+                <strong>Simple rule:</strong> choose the file, click <b>Check the Leads</b>, review the preview, then click <b>Add These Leads</b>.
+              </div>
+              <div class="import-drop">
+                <label>Choose Lead Files
+                  <input id="leadFileInput" type="file" multiple webkitdirectory directory accept=".csv,.json,application/json,text/csv">
+                </label>
+                <div class="form-actions">
+                  <button class="primary-btn" id="parseLeadFilesBtn" type="button">Check the Leads</button>
+                  <button class="ghost-btn" id="commitLeadImportBtn" type="button" disabled>Add These Leads</button>
+                </div>
+              </div>
+              <div id="importSummary" class="import-summary"></div>
+            </div>
+            <div class="panel">
+              <h3>Preview Before Adding</h3>
+              <div class="table-wrap compact-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Contact</th>
+                      <th>Obstacle</th>
+                      <th>Source</th>
+                    </tr>
+                  </thead>
+                  <tbody id="importPreviewTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="intakeView" aria-labelledby="viewTitle">
+          <div class="safety-note page-help"><strong>Data safety:</strong> Use estimates and categories only. Avoid entering SSNs, bank account numbers, full credit reports, tax returns, paystubs, or identity documents in this local version.</div>
+          <form class="intake-form" id="intakeForm">
+            <div class="form-section">
+              <h3>Buyer Basics</h3>
+              <p class="section-help">Run the Impossible File Scan when a buyer was denied, stalled, or told they are not ready. Only the name is required, but the scan is stronger when more fields are filled in.</p>
+              <div class="field-grid">
+                <label>Buyer Name<input name="name" required></label>
+                <label>Email<input name="email" type="email"></label>
+                <label>Phone<input name="phone" type="tel"></label>
+                <label>Target State<input name="state" maxlength="2" placeholder="AZ"></label>
+                <label>County<input name="county" placeholder="Maricopa"></label>
+                <label>Target City<input name="targetCity" placeholder="Phoenix"></label>
+                <label>Who Sent This Buyer?<input name="partner" placeholder="Agent, builder, or lead source"></label>
+                <label>Team Member Helping<input name="owner" value="Desk"></label>
+                <label>Target Price<input name="targetPrice" inputmode="numeric" placeholder="350000"></label>
+                <label>Timeline
+                  <select name="timeline">
+                    <option>Now</option>
+                    <option>30 days</option>
+                    <option>90 days</option>
+                    <option>6+ months</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Impossible File Scan</h3>
+              <p class="section-help">Answer in plain English. The tool will sort the buyer into a rescue tier and generate next steps. This is not an approval decision.</p>
+              <div class="field-grid">
+                <label>Where Is the File Now?
+                  <select name="stage">
+                    <option>New Intake</option>
+                    <option>Consent Needed</option>
+                    <option>File Review</option>
+                    <option>Missing Documents</option>
+                  </select>
+                </label>
+                <label>Already Denied?
+                  <select name="deniedStatus">
+                    <option>Not sure</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                </label>
+                <label>What Happened?
+                  <select name="whatHappened">
+                    <option>Denied by lender</option>
+                    <option>Pre-approval failed</option>
+                    <option>Underwriting problem</option>
+                    <option>Could not get enough cash to close</option>
+                    <option>Realtor said they are not ready</option>
+                    <option>Buyer gave up</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label>Credit Score Range
+                  <select name="creditRange">
+                    <option>Under 580</option>
+                    <option>580-619</option>
+                    <option>620-659</option>
+                    <option>660-699</option>
+                    <option>700+</option>
+                  </select>
+                </label>
+                <label>Monthly Gross Income<input name="monthlyIncome" inputmode="numeric" placeholder="6000"></label>
+                <label>Monthly Debt Estimate<input name="monthlyDebt" inputmode="numeric" placeholder="2200"></label>
+                <label>Cash Available<input name="cashAmount" inputmode="numeric" placeholder="8000"></label>
+                <label>Current Rent or Housing Payment<input name="housingPayment" inputmode="numeric" placeholder="1800"></label>
+                <label>Income Type
+                  <select name="incomeType">
+                    <option>W-2</option>
+                    <option>Self-employed</option>
+                    <option>1099 / Gig</option>
+                    <option>Mixed income</option>
+                    <option>Retired / fixed income</option>
+                    <option>Disability</option>
+                    <option>Unknown</option>
+                  </select>
+                </label>
+                <label>Veteran Eligible?
+                  <select name="veteranEligible">
+                    <option>Unknown</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                </label>
+                <label>First-Time Buyer?
+                  <select name="firstTimeBuyer">
+                    <option>Unknown</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                </label>
+                <label>Household Size<input name="householdSize" inputmode="numeric" placeholder="3"></label>
+                <label>Household Income Range
+                  <select name="householdIncomeRange">
+                    <option>Unknown</option>
+                    <option>Under $50k</option>
+                    <option>$50k-$75k</option>
+                    <option>$75k-$100k</option>
+                    <option>$100k+</option>
+                  </select>
+                </label>
+              </div>
+              <div class="checkbox-panel">
+                <h4>Main Problems</h4>
+                <div class="checkbox-grid">
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="Credit score too low"><span>Credit score too low</span></label>
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="Too much debt / DTI too high"><span>Too much debt / DTI too high</span></label>
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="Not enough cash to close"><span>Not enough cash to close</span></label>
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="Income could not be verified"><span>Income could not be verified</span></label>
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="Self-employed income problem"><span>Self-employed income problem</span></label>
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="Job history problem"><span>Job history problem</span></label>
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="Property/appraisal problem"><span>Property/appraisal problem</span></label>
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="Missing documents"><span>Missing documents</span></label>
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="VA/USDA/FHA/DPA not checked"><span>VA/USDA/FHA/DPA not checked</span></label>
+                  <label class="check-row"><input type="checkbox" name="mainProblems" value="Not sure"><span>Not sure</span></label>
+                </div>
+              </div>
+              <div class="checkbox-panel">
+                <h4>Documents Already Available</h4>
+                <div class="checkbox-grid">
+                  <label class="check-row"><input type="checkbox" name="availableDocs" value="Denial letter/adverse action notice"><span>Denial letter/adverse action notice</span></label>
+                  <label class="check-row"><input type="checkbox" name="availableDocs" value="Paystubs"><span>Paystubs</span></label>
+                  <label class="check-row"><input type="checkbox" name="availableDocs" value="W-2s/tax returns"><span>W-2s/tax returns</span></label>
+                  <label class="check-row"><input type="checkbox" name="availableDocs" value="Bank statements"><span>Bank statements</span></label>
+                  <label class="check-row"><input type="checkbox" name="availableDocs" value="ID"><span>ID</span></label>
+                  <label class="check-row"><input type="checkbox" name="availableDocs" value="Rent history proof"><span>Rent history proof</span></label>
+                </div>
+              </div>
+              <div class="checkbox-panel warning-panel">
+                <h4>Protection Flags</h4>
+                <div class="checkbox-grid">
+                  <label class="check-row"><input type="checkbox" name="protectionFlags" value="Affordability concern"><span>Affordability concern</span></label>
+                  <label class="check-row"><input type="checkbox" name="protectionFlags" value="No stable income"><span>No stable income</span></label>
+                  <label class="check-row"><input type="checkbox" name="protectionFlags" value="Fraud/misrepresentation concern"><span>Fraud/misrepresentation concern</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Next Step</h3>
+              <div class="field-grid">
+                <label>Permission to Share File
+                  <select name="consent">
+                    <option>Not Sent</option>
+                    <option>Sent</option>
+                    <option>Signed</option>
+                    <option>Revoked</option>
+                  </select>
+                </label>
+                <label>Next Step<input name="nextAction" value="Complete file review"></label>
+                <label>Possible Loan or Help Needed
+                  <select name="programInterest">
+                    <option>DPA / Grant</option>
+                    <option>FHA</option>
+                    <option>VA</option>
+                    <option>USDA</option>
+                    <option>Portfolio</option>
+                    <option>Non-QM</option>
+                  </select>
+                </label>
+              </div>
+              <label class="notes-label">Plain Notes<textarea name="notes" rows="4" placeholder="What happened with the buyer? What did the lender say?"></textarea></label>
+            </div>
+
+            <div class="form-actions">
+              <button class="primary-btn" type="submit">Create Buyer File</button>
+              <button class="ghost-btn" type="reset">Clear</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="view" id="diagnosisView" aria-labelledby="viewTitle">
+          <div class="split">
+            <div class="panel">
+              <h3>Buyer Review</h3>
+              <div class="safety-note"><strong>Data safety:</strong> Credit range, income estimates, debt estimates, cash estimates, and notes are sensitive. Keep prohibited documents and account numbers out of this local tool.</div>
+              <p class="section-help">This is the quick read on how difficult the file is and what route fits best.</p>
+              <label>Choose Buyer<select id="diagnosisSelect"></select></label>
+              <div id="diagnosisSummary"></div>
+            </div>
+            <div class="panel">
+              <h3>Suggested Plan</h3>
+              <div class="packet-actions">
+                <button class="primary-btn" id="exportPacketBtn" type="button">Export Partner Packet</button>
+                <button class="ghost-btn" id="copyPacketBtn" type="button">Copy Packet Text</button>
+                <button class="ghost-btn" id="printPacketBtn" type="button">Print Packet</button>
+              </div>
+              <div id="approvalPlan"></div>
+            </div>
+          </div>
+          <div class="split review-lower">
+            <div class="panel">
+              <h3>Edit Scan Answers</h3>
+              <p class="section-help">Use this when a buyer gives you updated income, cash, documents, or a new lender denial reason. Saving will recalculate the rescue tier and lender route.</p>
+              <form id="editScanForm" class="edit-scan-form">
+                <div class="field-grid">
+                  <label>Timeline
+                    <select name="timeline">
+                      <option>Now</option>
+                      <option>30 days</option>
+                      <option>90 days</option>
+                      <option>6+ months</option>
+                    </select>
+                  </label>
+                  <label>Credit Score Range
+                    <select name="creditRange">
+                      <option>Under 580</option>
+                      <option>580-619</option>
+                      <option>620-659</option>
+                      <option>660-699</option>
+                      <option>700+</option>
+                    </select>
+                  </label>
+                  <label>Monthly Gross Income<input name="monthlyIncome" inputmode="numeric"></label>
+                  <label>Monthly Debt Estimate<input name="monthlyDebt" inputmode="numeric"></label>
+                  <label>Cash Available<input name="cashAmount" inputmode="numeric"></label>
+                  <label>Income Type
+                    <select name="incomeType">
+                      <option>W-2</option>
+                      <option>Self-employed</option>
+                      <option>1099 / Gig</option>
+                      <option>Mixed income</option>
+                      <option>Retired / fixed income</option>
+                      <option>Disability</option>
+                      <option>Unknown</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="checkbox-panel">
+                  <h4>Main Problems</h4>
+                  <div class="checkbox-grid">
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="Credit score too low"><span>Credit score too low</span></label>
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="Too much debt / DTI too high"><span>Too much debt / DTI too high</span></label>
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="Not enough cash to close"><span>Not enough cash to close</span></label>
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="Income could not be verified"><span>Income could not be verified</span></label>
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="Self-employed income problem"><span>Self-employed income problem</span></label>
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="Job history problem"><span>Job history problem</span></label>
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="Property/appraisal problem"><span>Property/appraisal problem</span></label>
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="Missing documents"><span>Missing documents</span></label>
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="VA/USDA/FHA/DPA not checked"><span>VA/USDA/FHA/DPA not checked</span></label>
+                    <label class="check-row"><input type="checkbox" name="mainProblems" value="Not sure"><span>Not sure</span></label>
+                  </div>
+                </div>
+                <div class="checkbox-panel">
+                  <h4>Documents Already Available</h4>
+                  <div class="checkbox-grid">
+                    <label class="check-row"><input type="checkbox" name="availableDocs" value="Denial letter/adverse action notice"><span>Denial letter/adverse action notice</span></label>
+                    <label class="check-row"><input type="checkbox" name="availableDocs" value="Paystubs"><span>Paystubs</span></label>
+                    <label class="check-row"><input type="checkbox" name="availableDocs" value="W-2s/tax returns"><span>W-2s/tax returns</span></label>
+                    <label class="check-row"><input type="checkbox" name="availableDocs" value="Bank statements"><span>Bank statements</span></label>
+                    <label class="check-row"><input type="checkbox" name="availableDocs" value="ID"><span>ID</span></label>
+                    <label class="check-row"><input type="checkbox" name="availableDocs" value="Rent history proof"><span>Rent history proof</span></label>
+                  </div>
+                </div>
+                <div class="checkbox-panel warning-panel">
+                  <h4>Protection Flags</h4>
+                  <div class="checkbox-grid">
+                    <label class="check-row"><input type="checkbox" name="protectionFlags" value="Affordability concern"><span>Affordability concern</span></label>
+                    <label class="check-row"><input type="checkbox" name="protectionFlags" value="No stable income"><span>No stable income</span></label>
+                    <label class="check-row"><input type="checkbox" name="protectionFlags" value="Fraud/misrepresentation concern"><span>Fraud/misrepresentation concern</span></label>
+                  </div>
+                </div>
+                <button class="primary-btn" type="submit">Save and Recalculate</button>
+              </form>
+            </div>
+            <div class="panel">
+              <h3>Lender Match</h3>
+              <p class="section-help">This recommends a lender lane. It is not a loan approval or qualification decision.</p>
+              <div id="lenderMatchPanel"></div>
+            </div>
+          </div>
+          <div class="split review-lower">
+            <div class="panel">
+              <h3>Partner Visibility</h3>
+              <p class="section-help">Choose what outside partners can see. Consent is required before anything is shared.</p>
+              <form id="visibilityForm" class="edit-scan-form">
+                <div class="field-grid">
+                  <label>Visibility Level
+                    <select name="level" id="visibilityLevel">
+                      <option>None</option>
+                      <option>Basic status only</option>
+                      <option>Hard-file summary</option>
+                      <option>Full partner packet</option>
+                    </select>
+                  </label>
+                  <label>Shared With<input name="sharedWith" id="visibilitySharedWith" placeholder="Partner, lender, or counselor name"></label>
+                </div>
+                <label class="notes-label">Visibility Notes<textarea name="notes" id="visibilityNotes" rows="3"></textarea></label>
+                <button class="primary-btn" type="submit">Save Visibility</button>
+              </form>
+            </div>
+            <div class="panel">
+              <h3>Handoff Status</h3>
+              <p class="section-help">Track where the file has been sent and when to follow up.</p>
+              <form id="handoffForm" class="edit-scan-form">
+                <div class="field-grid">
+                  <label>Current Handoff Status
+                    <select name="status" id="handoffStatus"></select>
+                  </label>
+                  <label>Partner or Lender Name<input name="partnerName" id="handoffPartner"></label>
+                  <label>Contact Person<input name="contactPerson" id="handoffContact"></label>
+                  <label>Date Sent<input name="dateSent" id="handoffDateSent" type="date"></label>
+                  <label>Next Follow-Up Date<input name="nextFollowUp" id="handoffNextFollowUp" type="date"></label>
+                </div>
+                <label class="notes-label">Handoff Notes<textarea name="notes" id="handoffNotes" rows="3"></textarea></label>
+                <label class="check-row permission-confirm"><input type="checkbox" id="handoffPermissionConfirm"><span>I confirm the buyer has given permission to share this file.</span></label>
+                <div class="form-actions">
+                  <button class="ghost-btn" type="button" data-handoff-quick="Ready to send">Mark Ready to Send</button>
+                  <button class="ghost-btn" type="button" data-handoff-quick="Sent to lender">Mark Sent</button>
+                  <button class="ghost-btn" type="button" data-handoff-quick="In review">Mark In Review</button>
+                  <button class="ghost-btn" type="button" data-handoff-quick="More info requested">Mark More Info Requested</button>
+                  <button class="ghost-btn" type="button" data-handoff-quick="Paused">Mark Paused</button>
+                  <button class="ghost-btn" type="button" data-handoff-quick="Closed / completed">Mark Closed</button>
+                  <button class="primary-btn" type="submit">Save Handoff</button>
+                </div>
+              </form>
+            </div>
+            <div class="panel">
+              <h3>Outcome Tracking</h3>
+              <p class="section-help">Record what happened after the handoff so the business learns which lanes work.</p>
+              <form id="outcomeForm" class="edit-scan-form">
+                <div class="field-grid">
+                  <label>Outcome
+                    <select name="status" id="outcomeStatus"></select>
+                  </label>
+                  <label>Outcome Date<input name="date" id="outcomeDate" type="date"></label>
+                  <label>Outcome Source
+                    <select name="source" id="outcomeSource"></select>
+                  </label>
+                  <label>Reason It Worked
+                    <select name="workedReason" id="outcomeWorkedReason"></select>
+                  </label>
+                  <label>Reason It Failed
+                    <select name="failedReason" id="outcomeFailedReason"></select>
+                  </label>
+                  <label>Next Follow-Up Date<input name="nextFollowUp" id="outcomeNextFollowUp" type="date"></label>
+                </div>
+                <label class="notes-label">Outcome Notes<textarea name="notes" id="outcomeNotes" rows="3"></textarea></label>
+                <label class="notes-label">Next Action<input name="nextAction" id="outcomeNextAction"></label>
+                <button class="primary-btn" type="submit">Save Outcome</button>
+              </form>
+              <div id="learningSnapshot"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="queueView" aria-labelledby="viewTitle">
+          <div class="toolbar">
+            <label>
+              Work View
+              <select id="workQueueFilter"></select>
+            </label>
+          </div>
+          <div class="table-wrap work-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Buyer</th>
+                  <th>Rescue Tier</th>
+                  <th>Primary Blocker</th>
+                  <th>Lender Lane</th>
+                  <th>Handoff</th>
+                  <th>Outcome</th>
+                  <th>Follow-Up</th>
+                  <th>Next Action</th>
+                  <th>Quick Actions</th>
+                </tr>
+              </thead>
+              <tbody id="workQueueTable"></tbody>
+            </table>
+          </div>
+          <div class="split queue-layout">
+            <div class="panel">
+              <h3>Work This Buyer</h3>
+              <p class="section-help">Use this screen after every call or document review. Save the next step so nobody loses track.</p>
+              <label>Choose Buyer<select id="queueSelect"></select></label>
+              <div class="queue-controls">
+                <label>Where They Are<select id="queueStage"></select></label>
+                <label>Next Step<input id="queueNextAction"></label>
+                <label>Team Member Helping<input id="queueOwner"></label>
+              </div>
+              <div class="form-actions">
+                <button class="primary-btn" id="saveQueueBtn" type="button">Save Changes</button>
+                <button class="ghost-btn" id="markLenderReadyBtn" type="button">Ready for Lender Review</button>
+              </div>
+              <div id="queueSnapshot"></div>
+            </div>
+            <div class="panel">
+              <h3>Checklist</h3>
+              <div class="work-grid">
+                <div>
+                  <h4>To Do</h4>
+                  <div class="check-list" id="taskList"></div>
+                </div>
+                <div>
+                  <h4>Needed Items</h4>
+                  <div class="check-list" id="documentList"></div>
+                </div>
+              </div>
+              <form class="note-form" id="noteForm">
+                <label>Add a Note<textarea id="noteInput" rows="3" placeholder="Add call notes, lender response, or what changed"></textarea></label>
+                <button class="ghost-btn" type="submit">Save Note</button>
+              </form>
+              <div class="activity-list" id="activityList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="lendersView" aria-labelledby="viewTitle">
+          <div class="welcome-card compact-welcome">
+            <div>
+              <p class="eyebrow">Lender matching</p>
+              <h3>Use lenders by what they are actually good at.</h3>
+              <p>Do not send every buyer to the same lender. Match the buyer’s problem to a lender lane: down payment help, manual review, self-employed income, portfolio, VA, USDA, or non-QM.</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <label>
+              Buyer Problem
+              <select id="lenderFitFilter">
+                <option>All</option>
+                <option>DPA Stack Path</option>
+                <option>Manual Underwrite Path</option>
+                <option>Income Rescue Path</option>
+                <option>Alternative Product Path</option>
+              </select>
+            </label>
+          </div>
+          <div class="lender-grid" id="lenderGrid"></div>
+        </section>
+
+        <section class="view" id="partnersView" aria-labelledby="viewTitle">
+          <div class="help-box page-help">This view groups files by the agent, builder, or source that sent them. It helps you see who is sending useful buyer files.</div>
+          <div class="partner-grid" id="partnerGrid"></div>
+        </section>
+
+        <section class="view" id="consentView" aria-labelledby="viewTitle">
+          <div class="help-box page-help">Do not share a buyer file with lenders or outside partners until permission is marked signed.</div>
+          <div class="safety-note page-help"><strong>Data safety:</strong> Avoid entering SSNs, bank account numbers, full credit reports, tax returns, paystubs, or identity documents. Track permission status only.</div>
+          <div class="split review-lower">
+            <div class="panel">
+              <h3>Structured Consent</h3>
+              <p class="section-help">Use this to control exports, packet sharing, and partner handoffs.</p>
+              <form id="consentDetailForm" class="edit-scan-form">
+                <label>Choose Buyer<select id="consentBuyerSelect"></select></label>
+                <div class="checkbox-grid">
+                  <label class="check-row"><input type="checkbox" name="dataProcessing"><span>Data processing allowed</span></label>
+                  <label class="check-row"><input type="checkbox" name="contactPermission"><span>Contact permission</span></label>
+                  <label class="check-row"><input type="checkbox" name="shareWithLender"><span>Share with lender</span></label>
+                  <label class="check-row"><input type="checkbox" name="shareWithRealtorBuilder"><span>Share with realtor/builder</span></label>
+                  <label class="check-row"><input type="checkbox" name="shareWithCounselor"><span>Share with counselor</span></label>
+                  <label class="check-row"><input type="checkbox" name="packetExportAllowed"><span>Partner packet export allowed</span></label>
+                </div>
+                <label class="notes-label">Consent Notes<textarea name="notes" rows="3"></textarea></label>
+                <button class="primary-btn" type="submit">Save Permissions</button>
+              </form>
+            </div>
+            <div class="panel">
+              <h3>Backup / Restore</h3>
+              <p class="section-help">Backups may contain sensitive buyer information. Store backup files securely.</p>
+              <div class="form-actions">
+                <button class="ghost-btn" id="exportBackupBtn" type="button">Export Backup</button>
+              </div>
+              <div class="import-drop">
+                <label>Backup File<input id="backupFileInput" type="file" accept="application/json,.json"></label>
+                <label>Import Mode
+                  <select id="backupImportMode">
+                    <option value="merge">Merge with existing data</option>
+                    <option value="replace">Replace all local data</option>
+                  </select>
+                </label>
+                <button class="primary-btn" id="importBackupBtn" type="button">Import Backup</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Borrower</th>
+                  <th>Consent</th>
+                  <th>Referral Disclosure</th>
+                  <th>Data Sharing</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="consentTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" id="auditView" aria-labelledby="viewTitle">
+          <div class="help-box page-help">Audit logs are visible only to Owner and Admin roles. They record sensitive actions in plain English.</div>
+          <div class="toolbar">
+            <label>Buyer<input id="auditBuyerFilter" placeholder="Filter by buyer"></label>
+            <label>Action<input id="auditActionFilter" placeholder="Filter by action"></label>
+            <label>Actor<input id="auditActorFilter" placeholder="Filter by actor"></label>
+            <label>Role
+              <select id="auditRoleFilter">
+                <option>All</option>
+                <option>Owner</option>
+                <option>Admin</option>
+                <option>File Analyst</option>
+                <option>Partner</option>
+                <option>Lender</option>
+                <option>Counselor</option>
+                <option>Read Only</option>
+              </select>
+            </label>
+            <label>Date<input id="auditDateFilter" type="date"></label>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Actor</th>
+                  <th>Action</th>
+                  <th>Buyer</th>
+                  <th>Summary</th>
+                </tr>
+              </thead>
+              <tbody id="auditTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div class="modal-backdrop" id="packetModal" hidden>
+      <div class="modal">
+        <h2>Before sharing this packet</h2>
+        <div id="packetWarningText" class="help-box"></div>
+        <div class="safety-note"><strong>Data safety:</strong> Partner packets are high sensitivity. Keep SSNs, full credit reports, bank account numbers, tax returns, paystubs, and identity documents out of this local version.</div>
+        <label class="check-row permission-confirm"><input type="checkbox" id="packetPermissionConfirm"><span>I confirm the buyer gave permission and this packet does not include SSN, full credit reports, bank account numbers, or sensitive IDs.</span></label>
+        <div class="form-actions">
+          <button class="ghost-btn" id="cancelPacketBtn" type="button">Cancel</button>
+          <button class="primary-btn" id="confirmPacketBtn" type="button">Confirm and Continue</button>
+        </div>
+      </div>
+    </div>
+    <script src="storage.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

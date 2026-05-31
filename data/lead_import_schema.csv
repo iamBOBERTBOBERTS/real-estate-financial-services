@@ -1,0 +1,15 @@
+field,required,description,accepted_examples
+name,preferred,Borrower full name,Jane Smith
+email,preferred,Borrower email,jane@example.com
+phone,preferred,Borrower phone,555-0101
+state,optional,Target or property state,AZ
+partner,optional,Agent builder or lead source partner,ABC Realty
+obstacle,optional,Primary approval obstacle,High DTI
+creditBand,optional,Estimated middle credit score,620
+dti,optional,Estimated DTI percentage,51
+cash,optional,Cash status,ready; short; none
+incomeType,optional,Income category,W-2; Self-employed; 1099 / Gig; Mixed income; Retired / fixed income
+consent,optional,Consent status,Not Sent; Sent; Signed; Revoked
+targetPrice,optional,Target purchase price,350000
+programInterest,optional,Likely loan path,FHA; VA; USDA; DPA / Grant; Portfolio; Non-QM
+notes,optional,Freeform context,Declined by prior lender due to DTI

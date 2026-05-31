@@ -1,0 +1,2 @@
+name,email,phone,state,partner,denial_reason,credit_score,dti,cash_available,income_type,consent,target_price,program,notes
+Jane Buyer,jane@example.com,555-0100,AZ,Example Realty,High DTI,610,56,short,W-2,Not Sent,350000,FHA,Replace this row with a real buyer

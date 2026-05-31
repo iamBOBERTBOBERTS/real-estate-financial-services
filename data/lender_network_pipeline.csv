@@ -1,0 +1,5 @@
+lender_name,source_channel,official_source_url,nmls_id,contact_name,email,phone,states,target_lane,status,next_action,last_contact,notes
+FHA Candidate 1,HUD Lender List,https://www.hud.gov/program_offices/housing/sfh/lender/lenderlist,,,,,AZ,FHA Manual,Research,Verify NMLS,,Replace with real candidate
+VA Candidate 1,VA Lender Resources,https://www.benefits.va.gov/homeloans/lenders.asp,,,,,AZ,VA Rescue,Research,Find contact,,Replace with real candidate
+USDA Candidate 1,USDA Rural Development,https://www.rd.usda.gov/programs-services/single-family-housing-programs/single-family-housing-guaranteed-loan-program,,,,,AZ,USDA Zero Down,Research,Find contact,,Replace with real candidate
+Credit Union Candidate 1,NMLS Consumer Access,https://mortgage.nationwidelicensingsystem.org/about/Pages/NMLSConsumerAccess.aspx,,,,,AZ,Portfolio,Research,Verify lending appetite,,Replace with real candidate

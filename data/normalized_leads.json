@@ -1,0 +1,40 @@
+[
+  {
+    "name": "Jordan Price",
+    "email": "jordan@example.com",
+    "phone": "555-0141",
+    "state": "AZ",
+    "partner": "Sample Realty",
+    "source": "",
+    "obstacle": "High DTI",
+    "creditBand": "612",
+    "dti": "57",
+    "cash": "short",
+    "incomeType": "W-2",
+    "consent": "Sent",
+    "nextAction": "Request consent and complete intake",
+    "targetPrice": "325000",
+    "programInterest": "FHA",
+    "notes": "Sample imported lead",
+    "importSource": "imports/incoming/sample_leads.csv"
+  },
+  {
+    "name": "Samira Chen",
+    "email": "samira@example.com",
+    "phone": "555-0177",
+    "state": "AZ",
+    "partner": "Sample Builder",
+    "source": "",
+    "obstacle": "Self-employed income",
+    "creditBand": "684",
+    "dti": "49",
+    "cash": "ready",
+    "incomeType": "Self-employed",
+    "consent": "Signed",
+    "nextAction": "Request consent and complete intake",
+    "targetPrice": "475000",
+    "programInterest": "Non-QM",
+    "notes": "Sample imported lead",
+    "importSource": "imports/incoming/sample_leads.csv"
+  }
+]

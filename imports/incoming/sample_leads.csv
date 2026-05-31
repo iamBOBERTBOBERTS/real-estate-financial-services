@@ -1,0 +1,3 @@
+name,email,phone,state,partner,denial_reason,credit_score,dti,cash_available,income_type,consent,target_price,program,notes
+Jordan Price,jordan@example.com,555-0141,AZ,Sample Realty,High DTI,612,57,short,W-2,Not Sent,325000,FHA,Sample imported lead
+Samira Chen,samira@example.com,555-0177,AZ,Sample Builder,Self-employed income,684,49,18000,Self-employed,Signed,475000,Non-QM,Sample imported lead

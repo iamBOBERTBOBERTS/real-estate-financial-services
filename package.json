@@ -1,0 +1,17 @@
+{
+  "name": "approvalpath-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local hard-file buyer workflow prototype with consent, packet, handoff, outcome, audit, and backup tooling.",
+  "scripts": {
+    "start": "http-server app -p 4174 -c-1",
+    "check": "node --check app/storage.js && node --check app/app.js",
+    "smoke-test": "node scripts/smoke-test.js",
+    "test:e2e": "playwright test",
+    "verify": "npm run check && npm run smoke-test && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "http-server": "^14.1.1"
+  }
+}

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Start Here - ApprovalPath OS</title>
+    <style>
+      :root {
+        --ink: #17212b;
+        --paper: #f7f8fa;
+        --white: #ffffff;
+        --green: #1f8a70;
+        --amber: #d99a29;
+        --steel: #667085;
+        --border: #d9dee7;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 42px 22px;
+      }
+
+      .hero,
+      .card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        box-shadow: 0 12px 34px rgba(23, 33, 43, 0.08);
+      }
+
+      .hero {
+        padding: 32px;
+        border-left: 6px solid var(--green);
+      }
+
+      h1,
+      h2,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        font-size: 36px;
+        line-height: 1.08;
+        margin-bottom: 10px;
+      }
+
+      .sub {
+        color: var(--steel);
+        font-size: 18px;
+        max-width: 760px;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      a.button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .primary {
+        background: var(--green);
+        color: var(--white);
+      }
+
+      .secondary {
+        border: 1px solid var(--border);
+        color: var(--ink);
+        background: var(--white);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .number {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        color: var(--white);
+        background: var(--green);
+        font-weight: 900;
+        margin-bottom: 12px;
+      }
+
+      .warning {
+        background: #fff8ea;
+        border: 1px solid #f0d7a6;
+        color: #65440f;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin-top: 18px;
+      }
+
+      @media (max-width: 760px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1>ApprovalPath OS</h1>
+        <p class="sub">A simple workspace for helping hard-to-approve homebuyers move from “not approved” to a clear next step.</p>
+        <div class="button-row">
+          <a class="button primary" href="app/index.html">Open the Tool</a>
+          <a class="button secondary" href="USER_GUIDE_NONTECHNICAL.md">Read the Simple Guide</a>
+        </div>
+      </section>
+
+      <section class="grid" aria-label="How to use the tool">
+        <div class="card">
+          <div class="number">1</div>
+          <h2>Add Buyers</h2>
+          <p>Add one buyer manually, or upload a spreadsheet of leads.</p>
+        </div>
+        <div class="card">
+          <div class="number">2</div>
+          <h2>Work Files</h2>
+          <p>Open a buyer file, complete the checklist, and save the next step.</p>
+        </div>
+        <div class="card">
+          <div class="number">3</div>
+          <h2>Find the Route</h2>
+          <p>Match the buyer to the right lender lane, program, or build plan.</p>
+        </div>
+      </section>
+
+      <div class="warning">
+        This tool does not guarantee approval and should not be used to share borrower information until permission is signed.
+      </div>
+    </main>
+  </body>
+</html>
