@@ -14,6 +14,98 @@ const stages = [
   "Closed/Lost"
 ];
 
+// Dynamic template values are escaped by safeHtml before reaching innerHTML.
+// The interceptor is a second boundary that removes active or network-capable
+// elements and executable attributes from every template write.
+const safeHtmlBrand = Symbol("safeHtml");
+
+function safeHtml(strings, ...values) {
+  let markup = strings[0];
+  values.forEach((value, index) => {
+    markup += safeHtmlValue(value) + strings[index + 1];
+  });
+  return Object.freeze({
+    [safeHtmlBrand]: true,
+    toString: () => markup
+  });
+}
+
+function safeHtmlValue(value) {
+  if (value?.[safeHtmlBrand]) return String(value);
+  if (Array.isArray(value)) return value.map(safeHtmlValue).join("");
+  return escapeHtml(value);
+}
+
+const nativeInnerHtml = Object.getOwnPropertyDescriptor(Element.prototype, "innerHTML");
+const blockedTemplateTags = new Set([
+  "BASE",
+  "AUDIO",
+  "EMBED",
+  "FORM",
+  "IFRAME",
+  "IMG",
+  "LINK",
+  "MATH",
+  "META",
+  "OBJECT",
+  "SCRIPT",
+  "SOURCE",
+  "STYLE",
+  "SVG",
+  "TRACK",
+  "VIDEO"
+]);
+const urlAttributes = new Set(["action", "formaction", "href", "poster", "src", "xlink:href"]);
+
+function sanitizedTemplateFragment(markup) {
+  const template = document.createElement("template");
+  nativeInnerHtml.set.call(template, String(markup));
+
+  template.content.querySelectorAll("*").forEach((element) => {
+    if (blockedTemplateTags.has(element.tagName)) {
+      element.remove();
+      return;
+    }
+
+    [...element.attributes].forEach((attribute) => {
+      const name = attribute.name.toLowerCase();
+      if (name.startsWith("on") || name === "srcdoc" || name === "nonce") {
+        element.removeAttribute(attribute.name);
+        return;
+      }
+      if (name === "style" && !(element.classList.contains("score-ring") && /^--score:\d{1,3}$/.test(attribute.value))) {
+        element.removeAttribute(attribute.name);
+        return;
+      }
+      if (urlAttributes.has(name)) {
+        try {
+          const url = new URL(attribute.value, window.location.origin);
+          if (url.origin !== window.location.origin || !["http:", "https:"].includes(url.protocol)) {
+            element.removeAttribute(attribute.name);
+          }
+        } catch {
+          element.removeAttribute(attribute.name);
+        }
+      }
+    });
+  });
+
+  return template.content;
+}
+
+if (nativeInnerHtml?.get && nativeInnerHtml?.set) {
+  Object.defineProperty(Element.prototype, "innerHTML", {
+    configurable: true,
+    enumerable: nativeInnerHtml.enumerable,
+    get() {
+      return nativeInnerHtml.get.call(this);
+    },
+    set(markup) {
+      this.replaceChildren(sanitizedTemplateFragment(markup).cloneNode(true));
+    }
+  });
+}
+
 const paths = [
   "All",
   "DPA Stack Path",
@@ -841,7 +933,7 @@ function setupNavigation() {
     });
   });
   const roleSelect = document.getElementById("currentRoleSelect");
-  roleSelect.innerHTML = userRoles.map((role) => `<option>${role}</option>`).join("");
+  roleSelect.replaceChildren(...userRoles.map((role) => new Option(role, role)));
   roleSelect.value = currentUser.role || "Owner";
   roleSelect.addEventListener("change", () => {
     const before = { ...currentUser };
@@ -882,15 +974,15 @@ function populateFilters() {
   const outcomeSource = document.getElementById("outcomeSource");
   const outcomeWorkedReason = document.getElementById("outcomeWorkedReason");
   const outcomeFailedReason = document.getElementById("outcomeFailedReason");
-  stageFilter.innerHTML = stages.map((stage) => `<option>${stage}</option>`).join("");
-  pathFilter.innerHTML = paths.map((path) => `<option>${path}</option>`).join("");
-  queueStage.innerHTML = stages.filter((stage) => stage !== "All").map((stage) => `<option>${stage}</option>`).join("");
-  workQueueFilter.innerHTML = workViews.map((view) => `<option>${view}</option>`).join("");
-  handoffStatus.innerHTML = handoffStatuses.map((status) => `<option>${status}</option>`).join("");
-  outcomeStatus.innerHTML = outcomeStatuses.map((status) => `<option>${status}</option>`).join("");
-  outcomeSource.innerHTML = outcomeSources.map((source) => `<option>${source}</option>`).join("");
-  outcomeWorkedReason.innerHTML = workedReasons.map((reason) => `<option>${reason}</option>`).join("");
-  outcomeFailedReason.innerHTML = failedReasons.map((reason) => `<option>${reason}</option>`).join("");
+  stageFilter.replaceChildren(...stages.map((stage) => new Option(stage, stage)));
+  pathFilter.replaceChildren(...paths.map((path) => new Option(path, path)));
+  queueStage.replaceChildren(...stages.filter((stage) => stage !== "All").map((stage) => new Option(stage, stage)));
+  workQueueFilter.replaceChildren(...workViews.map((view) => new Option(view, view)));
+  handoffStatus.replaceChildren(...handoffStatuses.map((status) => new Option(status, status)));
+  outcomeStatus.replaceChildren(...outcomeStatuses.map((status) => new Option(status, status)));
+  outcomeSource.replaceChildren(...outcomeSources.map((source) => new Option(source, source)));
+  outcomeWorkedReason.replaceChildren(...workedReasons.map((reason) => new Option(reason, reason)));
+  outcomeFailedReason.replaceChildren(...failedReasons.map((reason) => new Option(reason, reason)));
   stageFilter.addEventListener("change", renderCommand);
   pathFilter.addEventListener("change", renderCommand);
   workQueueFilter.addEventListener("change", renderWorkQueue);
@@ -937,30 +1029,64 @@ function renderImportPreview() {
   const button = document.getElementById("commitLeadImportBtn");
   if (!summary || !button) return;
   button.disabled = pendingImports.length === 0;
-  summary.innerHTML = pendingImports.length
-    ? `<div class="snapshot"><div><span>Checked</span><strong>${pendingImports.length}</strong></div><div><span>New Leads</span><strong>${pendingImports.filter((lead) => !isDuplicateLead(lead)).length}</strong></div></div>`
-    : `<p class="muted">No leads checked yet. Choose a CSV or JSON file, then click Check the Leads.</p>`;
+  summary.replaceChildren();
+  if (pendingImports.length) {
+    const snapshot = document.createElement("div");
+    snapshot.className = "snapshot";
+    [["Checked", pendingImports.length], ["New Leads", pendingImports.filter((lead) => !isDuplicateLead(lead)).length]].forEach(([label, value]) => {
+      const item = document.createElement("div");
+      const title = document.createElement("span");
+      const count = document.createElement("strong");
+      title.textContent = String(label);
+      count.textContent = String(value);
+      item.append(title, count);
+      snapshot.append(item);
+    });
+    summary.append(snapshot);
+  } else {
+    const empty = document.createElement("p");
+    empty.className = "muted";
+    empty.textContent = "No leads checked yet. Choose a CSV or JSON file, then click Check the Leads.";
+    summary.append(empty);
+  }
 
-  document.getElementById("importPreviewTable").innerHTML = pendingImports.length ? pendingImports
-    .slice(0, 100)
-    .map((lead) => `
-      <tr>
-        <td><div class="borrower-name">${lead.name || "Unnamed Lead"}<span class="muted">${isDuplicateLead(lead) ? "Possible duplicate" : "New file"}</span></div></td>
-        <td>${lead.email || lead.phone || "No contact"}</td>
-        <td>${lead.obstacle || "Prior denial"}</td>
-        <td>${lead.importSource || "Uploaded file"}</td>
-      </tr>
-    `)
-    .join("") : `
-      <tr>
-        <td colspan="4">
-          <div class="empty-state">
-            <strong>Nothing to preview yet.</strong>
-            <span>After you check a lead file, the first 100 leads will appear here.</span>
-          </div>
-        </td>
-      </tr>
-    `;
+  const table = document.getElementById("importPreviewTable");
+  table.replaceChildren();
+  if (pendingImports.length) {
+    pendingImports.slice(0, 100).forEach((lead) => {
+      const row = document.createElement("tr");
+      const nameCell = document.createElement("td");
+      const name = document.createElement("div");
+      const duplicate = document.createElement("span");
+      name.className = "borrower-name";
+      duplicate.className = "muted";
+      name.append(document.createTextNode(lead.name || "Unnamed Lead"));
+      duplicate.textContent = isDuplicateLead(lead) ? "Possible duplicate" : "New file";
+      name.append(duplicate);
+      nameCell.append(name);
+      const values = [lead.email || lead.phone || "No contact", lead.obstacle || "Prior denial", lead.importSource || "Uploaded file"];
+      row.append(nameCell, ...values.map((value) => {
+        const cell = document.createElement("td");
+        cell.textContent = String(value);
+        return cell;
+      }));
+      table.append(row);
+    });
+  } else {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    const empty = document.createElement("div");
+    const title = document.createElement("strong");
+    const detail = document.createElement("span");
+    cell.colSpan = 4;
+    empty.className = "empty-state";
+    title.textContent = "Nothing to preview yet.";
+    detail.textContent = "After you check a lead file, the first 100 leads will appear here.";
+    empty.append(title, detail);
+    cell.append(empty);
+    row.append(cell);
+    table.append(row);
+  }
 }
 
 function renderCommand() {
@@ -973,16 +1099,15 @@ function renderCommand() {
     ["Ready for Lender", visible.filter((file) => ["Lender Match Ready", "Submitted to Partner", "Approved"].includes(file.stage)).length]
   ];
 
-  document.getElementById("metricGrid").innerHTML = metrics
-    .map(([label, value]) => `<div class="metric"><span>${label}</span><strong>${value}</strong></div>`)
-    .join("");
+  document.getElementById("metricGrid").innerHTML = safeHtml`${metrics
+    .map(([label, value]) => safeHtml`<div class="metric"><span>${label}</span><strong>${value}</strong></div>`)}`;
 
-  document.getElementById("borrowerTable").innerHTML = rows.length ? rows
+  document.getElementById("borrowerTable").innerHTML = rows.length ? safeHtml`${rows
     .map((file) => {
       const score = calculateScore(file).total;
       const status = statusFor(score);
       const path = pathFor(file);
-      return `
+      return safeHtml`
         <tr>
           <td><div class="borrower-name">${file.name}<span class="muted">${file.partner || "Direct"} · ${file.state || "NA"}</span></div></td>
           <td><span class="pill ${pillClass(file.stage)}">${file.stage}</span></td>
@@ -994,8 +1119,7 @@ function renderCommand() {
           <td><button class="small-btn" type="button" data-open-file="${file.id}">Open File</button></td>
         </tr>
       `;
-    })
-    .join("") : `
+    })}` : safeHtml`
       <tr>
         <td colspan="8">
           <div class="empty-state">
@@ -1044,9 +1168,9 @@ function renderDashboard() {
 }
 
 function miniMetrics(items) {
-  return items.length ? items
-    .map(([label, value]) => `<div class="mini-metric"><span>${label}</span><strong>${value}</strong></div>`)
-    .join("") : `<p class="muted">No data yet.</p>`;
+  return items.length ? safeHtml`${items
+    .map(([label, value]) => safeHtml`<div class="mini-metric"><span>${label}</span><strong>${value}</strong></div>`)}`
+    : safeHtml`<p class="muted">No data yet.</p>`;
 }
 
 function topCounts(values) {
@@ -1199,17 +1323,20 @@ function obstacleFromScanProblems(problems) {
 function setupLeadImport() {
   document.getElementById("parseLeadFilesBtn").addEventListener("click", async () => {
     const input = document.getElementById("leadFileInput");
-    const files = [...input.files].filter((file) => /\.(csv|json)$/i.test(file.name));
+    const files = [...input.files]
+      .filter((file) => /\.(csv|json)$/i.test(file.name) && file.size <= 2 * 1024 * 1024)
+      .slice(0, 5);
     const parsed = [];
 
     for (const file of files) {
       const text = await file.text();
       const source = file.webkitRelativePath || file.name;
       if (/\.json$/i.test(file.name)) {
-        parsed.push(...parseJsonLeads(text, source));
+        parsed.push(...parseJsonLeads(text, source).slice(0, 500 - parsed.length));
       } else {
-        parsed.push(...parseCsvLeads(text, source));
+        parsed.push(...parseCsvLeads(text, source).slice(0, 500 - parsed.length));
       }
+      if (parsed.length >= 500) break;
     }
 
     pendingImports = parsed.map(normalizeLead).filter((lead) => lead.name || lead.email || lead.phone);
@@ -1396,7 +1523,7 @@ function renderDiagnosis() {
   const select = document.getElementById("diagnosisSelect");
   const list = selectedBuyerList();
   const selected = selectedFileId || select.value || list[0]?.id;
-  select.innerHTML = list.map((file) => `<option value="${file.id}">${file.name}</option>`).join("");
+  select.replaceChildren(...list.map((file) => new Option(file.name, file.id)));
   select.value = selected && list.some((file) => file.id === selected) ? selected : list[0]?.id;
   select.onchange = () => {
     selectedFileId = select.value;
@@ -1421,7 +1548,7 @@ function renderDiagnosis() {
   fillVisibilityForm(file);
   renderLearningSnapshot(file);
 
-  document.getElementById("diagnosisSummary").innerHTML = `
+  document.getElementById("diagnosisSummary").innerHTML = safeHtml`
     ${hardFileReviewCard(file, scan)}
     <div class="score-ring" style="--score:${score.total}"><span>${score.total}</span></div>
     <div class="tag-row">
@@ -1440,12 +1567,12 @@ function renderDiagnosis() {
   `;
 
   const limitedLevel = !isInternalRole() ? file.visibility?.level : "Full partner packet";
-  document.getElementById("approvalPlan").innerHTML = visibilityRank(limitedLevel) < 2 ? `
+  document.getElementById("approvalPlan").innerHTML = visibilityRank(limitedLevel) < 2 ? safeHtml`
     <div class="empty-state">
       <strong>Limited view</strong>
       <span>This role can see basic status only for this shared file.</span>
     </div>
-  ` : `
+  ` : safeHtml`
     <div class="tag-row">
       <span class="pill blue">${file.obstacle}</span>
       <span class="pill">${file.programInterest}</span>
@@ -1507,7 +1634,7 @@ function hardFileReviewCard(file, scan) {
   const secondary = scan.secondaryBlockers.length
     ? scan.secondaryBlockers.map((blocker) => blockerLabels[blocker] || blocker).join(", ")
     : "None identified yet";
-  return `
+  return safeHtml`
     <section class="hard-review">
       <div>
         <p class="eyebrow">Hard-File Review</p>
@@ -1636,7 +1763,7 @@ function renderLenderMatch(file) {
   const panel = document.getElementById("lenderMatchPanel");
   if (!panel) return;
   const match = lenderMatchFor(file);
-  panel.innerHTML = `
+  panel.innerHTML = safeHtml`
     <div class="lane-card">
       <p class="eyebrow">Recommended lender lane</p>
       <h4>${match.lane}</h4>
@@ -1648,13 +1775,13 @@ function renderLenderMatch(file) {
       </div>
     </div>
     <div class="matched-lenders">
-      ${match.matched.length ? match.matched.map((lender) => `
+      ${match.matched.length ? match.matched.map((lender) => safeHtml`
         <article class="mini-lender-card">
           <strong>${lender.name}</strong>
           <span>${lender.type} · ${lender.states}</span>
           <small>${lender.fit.join(", ")}</small>
         </article>
-      `).join("") : `
+      `) : safeHtml`
         <div class="empty-state">
           <strong>No lender in this lane yet.</strong>
           <span>Add one to the lender matrix before routing this file.</span>
@@ -1669,7 +1796,7 @@ function renderQueue() {
   const list = selectedBuyerList();
   if (!selectedFileId && list[0]) selectedFileId = list[0].id;
   const previous = selectedFileId;
-  select.innerHTML = list.map((file) => `<option value="${file.id}">${file.name}</option>`).join("");
+  select.replaceChildren(...list.map((file) => new Option(file.name, file.id)));
   select.value = list.some((file) => file.id === previous) ? previous : list[0]?.id || "";
   selectedFileId = select.value;
   select.onchange = () => {
@@ -1678,8 +1805,11 @@ function renderQueue() {
   };
 
   const file = activeFile();
+  const queueSnapshot = document.getElementById("queueSnapshot");
   if (!file) {
-    document.getElementById("queueSnapshot").innerHTML = "<p>No buyer files yet.</p>";
+    const empty = document.createElement("p");
+    empty.textContent = "No buyer files yet.";
+    queueSnapshot.replaceChildren(empty);
     return;
   }
 
@@ -1690,31 +1820,34 @@ function renderQueue() {
   document.getElementById("queueNextAction").value = file.nextAction || "";
   document.getElementById("queueOwner").value = file.owner || "";
 
-  document.getElementById("queueSnapshot").innerHTML = `
-    <div class="snapshot">
-      <div><span>Score</span><strong>${score}</strong></div>
-      <div><span>Readiness</span><strong>${status}</strong></div>
-      <div><span>Best Route</span><strong>${path}</strong></div>
-      <div><span>Permission</span><strong>${file.consent || "Not Sent"}</strong></div>
-    </div>
-    <p class="muted">${file.notes || "No notes on this file yet."}</p>
-  `;
+  const snapshot = document.createElement("div");
+  snapshot.className = "snapshot";
+  [["Score", score], ["Readiness", status], ["Best Route", path], ["Permission", file.consent || "Not Sent"]].forEach(([label, value]) => {
+    const item = document.createElement("div");
+    const title = document.createElement("span");
+    const detail = document.createElement("strong");
+    title.textContent = String(label);
+    detail.textContent = String(value);
+    item.append(title, detail);
+    snapshot.append(item);
+  });
+  const notes = document.createElement("p");
+  notes.className = "muted";
+  notes.textContent = file.notes || "No notes on this file yet.";
+  queueSnapshot.replaceChildren(snapshot, notes);
 
-  document.getElementById("taskList").innerHTML = file.tasks
-    .map((task) => checkRow(task, "task"))
-    .join("");
-  document.getElementById("documentList").innerHTML = file.documents
-    .map((doc) => checkRow(doc, "document"))
-    .join("");
-  document.getElementById("activityList").innerHTML = [...file.activity]
+  document.getElementById("taskList").innerHTML = safeHtml`${file.tasks
+    .map((task) => checkRow(task, "task"))}`;
+  document.getElementById("documentList").innerHTML = safeHtml`${file.documents
+    .map((doc) => checkRow(doc, "document"))}`;
+  document.getElementById("activityList").innerHTML = safeHtml`${[...file.activity]
     .reverse()
-    .map((item) => `
+    .map((item) => safeHtml`
       <div class="activity-item">
         <strong>${formatDate(item.at)}</strong>
         <p>${item.note}</p>
       </div>
-    `)
-    .join("");
+    `)}`;
 
   document.querySelectorAll("[data-check-type]").forEach((checkbox) => {
     checkbox.addEventListener("change", () => {
@@ -1739,14 +1872,14 @@ function renderWorkQueue() {
   if (!table) return;
   const rows = visibleBorrowers().filter((file) => matchesWorkView(file, filter));
 
-  table.innerHTML = rows.length ? rows
+  table.innerHTML = rows.length ? safeHtml`${rows
     .map((file) => {
       const scan = file.scan || buildScanResult(file);
       const handoff = file.handoff || defaultHandoff(file);
       const outcome = file.outcome || defaultOutcome(file);
       const followUp = outcome.nextFollowUp || handoff.nextFollowUp || "";
       const nextAction = outcome.nextAction || file.nextAction || scan.recommendedNextMove;
-      return `
+      return safeHtml`
         <tr>
           <td><div class="borrower-name">${file.name}<span class="muted">${file.partner || "Direct"} · ${file.state || "NA"}</span></div></td>
           <td><span class="pill ${pillClass(scan.rescueTier)}">${scan.rescueTier}</span></td>
@@ -1766,8 +1899,7 @@ function renderWorkQueue() {
           </td>
         </tr>
       `;
-    })
-    .join("") : `
+    })}` : safeHtml`
       <tr>
         <td colspan="9">
           <div class="empty-state">
@@ -1860,7 +1992,7 @@ function activeFile() {
 }
 
 function checkRow(item, type) {
-  return `
+  return safeHtml`
     <label class="check-row">
       <input type="checkbox" ${item.done ? "checked" : ""} data-check-type="${type}" data-check-id="${item.id}">
       <span>${item.label}</span>
@@ -2059,11 +2191,11 @@ function setupHandoffOutcomeForms() {
 }
 
 function breakdownRow(label, value, max) {
-  return `<div class="breakdown-row"><span>${label}</span><strong>${value}/${max}</strong></div>`;
+  return safeHtml`<div class="breakdown-row"><span>${label}</span><strong>${value}/${max}</strong></div>`;
 }
 
 function planItem(label, value) {
-  return `<div class="plan-item"><strong>${label}</strong><span>${value}</span></div>`;
+  return safeHtml`<div class="plan-item"><strong>${label}</strong><span>${value}</span></div>`;
 }
 
 function immediateAction(file) {
@@ -2101,20 +2233,19 @@ function routingAction(path) {
 function renderLenders() {
   const filter = document.getElementById("lenderFitFilter").value || "All";
   const rows = lenders.filter((lender) => filter === "All" || lender.fit.includes(filter));
-  document.getElementById("lenderGrid").innerHTML = rows
-    .map((lender) => `
+  document.getElementById("lenderGrid").innerHTML = safeHtml`${rows
+    .map((lender) => safeHtml`
       <article class="lender-card">
         <h3>${lender.name}</h3>
         <p class="muted">${lender.type} · ${lender.states}</p>
-        <div class="tag-row">${lender.fit.map((fit) => `<span class="pill blue">${fit}</span>`).join("")}</div>
-        <div class="tag-row">${(lender.lanes || []).map((lane) => `<span class="pill green">${lane}</span>`).join("")}</div>
+        <div class="tag-row">${lender.fit.map((fit) => safeHtml`<span class="pill blue">${fit}</span>`)}</div>
+        <div class="tag-row">${(lender.lanes || []).map((lane) => safeHtml`<span class="pill green">${lane}</span>`)}</div>
         <p><strong>Score:</strong> ${lender.score}</p>
         <p><strong>DTI:</strong> ${lender.dti} · <strong>Manual:</strong> ${lender.manual}</p>
         <p><strong>DPA:</strong> ${lender.dpa} · <strong>Self-employed:</strong> ${lender.selfEmployed}</p>
         ${lenderPerformanceCard(lender)}
       </article>
-    `)
-    .join("");
+    `)}`;
 }
 
 function lenderPerformanceCard(lender) {
@@ -2127,7 +2258,7 @@ function lenderPerformanceCard(lender) {
     .slice(0, 3)
     .map(([blocker, count]) => `${blocker} (${count})`)
     .join(", ") || "No pattern yet";
-  return `
+  return safeHtml`
     <div class="performance-box">
       <strong>Performance Notes</strong>
       <div class="performance-grid">
@@ -2150,11 +2281,11 @@ function renderPartners() {
     return acc;
   }, {});
 
-  document.getElementById("partnerGrid").innerHTML = Object.entries(grouped)
+  document.getElementById("partnerGrid").innerHTML = safeHtml`${Object.entries(grouped)
     .map(([partner, files]) => {
       const avg = Math.round(files.reduce((sum, file) => sum + calculateScore(file).total, 0) / files.length);
       const ready = files.filter((file) => statusFor(calculateScore(file).total).includes("Fundable")).length;
-      return `
+      return safeHtml`
         <article class="partner-card">
           <h3>${partner}</h3>
           <p class="muted">${files.length} active files</p>
@@ -2165,8 +2296,7 @@ function renderPartners() {
           <p><strong>Next:</strong> ${files[0].nextAction || "Review pipeline"}</p>
         </article>
       `;
-    })
-    .join("");
+    })}`;
 }
 
 function renderConsent() {
@@ -2174,7 +2304,7 @@ function renderConsent() {
   if (select) {
     const list = selectedBuyerList();
     const previous = select.value || selectedFileId || list[0]?.id;
-    select.innerHTML = list.map((file) => `<option value="${file.id}">${file.name}</option>`).join("");
+    select.replaceChildren(...list.map((file) => new Option(file.name, file.id)));
     select.value = list.some((file) => file.id === previous) ? previous : list[0]?.id || "";
     select.onchange = () => {
       fillConsentDetailForm(borrowers.find((file) => file.id === select.value));
@@ -2182,8 +2312,8 @@ function renderConsent() {
     fillConsentDetailForm(borrowers.find((file) => file.id === select.value));
   }
 
-  document.getElementById("consentTable").innerHTML = visibleBorrowers()
-    .map((file) => `
+  document.getElementById("consentTable").innerHTML = safeHtml`${visibleBorrowers()
+    .map((file) => safeHtml`
       <tr>
         <td><div class="borrower-name">${file.name}<span class="muted">${file.email || "No email"}</span></div></td>
         <td><span class="pill ${pillClass(file.consent)}">${file.consent}</span></td>
@@ -2191,8 +2321,7 @@ function renderConsent() {
         <td>${hasAnyShareConsent(file) ? "Authorized by selected permissions" : "Hold"}</td>
         <td><button class="small-btn" type="button" data-consent-id="${file.id}">${file.consent === "Signed" ? "Revoke" : "Mark Signed"}</button></td>
       </tr>
-    `)
-    .join("");
+    `)}`;
 
   document.querySelectorAll("[data-consent-id]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -2299,10 +2428,10 @@ function renderLearningSnapshot(file) {
     lessons.push("No pattern yet. Save handoff and outcome notes after the next partner response.");
   }
 
-  target.innerHTML = `
+  target.innerHTML = safeHtml`
     <div class="learning-card">
       <p class="eyebrow">Learning Snapshot</p>
-      <ul>${uniqueList(lessons).map((lesson) => `<li>${lesson}</li>`).join("")}</ul>
+      <ul>${uniqueList(lessons).map((lesson) => safeHtml`<li>${lesson}</li>`)}</ul>
     </div>
   `;
 }
@@ -2350,9 +2479,9 @@ function showPacketSafety(action) {
   const warning = document.getElementById("packetWarningText");
   confirm.checked = false;
   const protectText = file.scan?.rescueTier === "Protect & Refer"
-    ? "<strong>Extra caution:</strong> this file is marked Protect & Refer. Do not route it as lender-ready. Share only with the proper counseling, nonprofit, or qualified professional after permission is confirmed."
+    ? safeHtml`<strong>Extra caution:</strong> this file is marked Protect & Refer. Do not route it as lender-ready. Share only with the proper counseling, nonprofit, or qualified professional after permission is confirmed.`
     : "Confirm this packet is being shared only for routing or review with permission from the buyer.";
-  warning.innerHTML = `
+  warning.innerHTML = safeHtml`
     <p>${protectText}</p>
     <p>Do not include SSN, full credit reports, bank account numbers, sensitive IDs, or private account details. Do not promise approval or make formal eligibility statements. Licensed mortgage professionals must discuss loan terms and formal eligibility.</p>
   `;
@@ -2479,7 +2608,7 @@ function moneyText(value) {
 }
 
 function escapeHtml(value) {
-  return String(value || "")
+  return String(value === undefined || value === null ? "" : value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -2527,21 +2656,29 @@ function setupBackupControls() {
       window.alert("Choose a backup JSON file first.");
       return;
     }
+    if (file.size > storage.maxImportBytes) {
+      window.alert("That backup file is too large to import safely.");
+      return;
+    }
     const mode = document.getElementById("backupImportMode").value;
     const ok = window.confirm("Importing a backup may replace or merge existing data. Make sure you trust this file.");
     if (!ok) return;
     try {
       const data = JSON.parse(await file.text());
       storage.importAll(data, mode);
-      borrowers = loadBorrowers();
-      lenders = storage.getLenders(defaultLenders);
-      selectedFileId = borrowers[0]?.id || "";
-      audit("Data imported", "Backup", "", "", `Imported backup with ${mode} mode.`);
-      saveBorrowers();
-      render();
     } catch {
       window.alert("That backup file could not be read. Please choose a valid JSON backup.");
+      return;
     }
+    borrowers = loadBorrowers();
+    lenders = storage.getLenders(defaultLenders);
+    selectedFileId = borrowers[0]?.id || "";
+    try {
+      audit("Data imported", "Backup", "", "", `Imported backup with ${mode} mode.`);
+    } catch {
+      window.alert("The backup was imported, but its audit entry could not be saved because local storage is full.");
+    }
+    render();
   });
 }
 
@@ -2565,7 +2702,7 @@ function renderAuditLogs() {
     const matchesDate = !date || String(log.timestamp || "").startsWith(date);
     return matchesBuyer && matchesAction && matchesActor && matchesRole && matchesDate;
   });
-  table.innerHTML = rows.length ? rows.map((log) => `
+  table.innerHTML = rows.length ? safeHtml`${rows.map((log) => safeHtml`
     <tr>
       <td>${formatDate(log.timestamp)}</td>
       <td><div class="borrower-name">${log.actorName}<span class="muted">${log.actorRole}</span></div></td>
@@ -2573,7 +2710,7 @@ function renderAuditLogs() {
       <td>${log.buyerName || "Not buyer-specific"}</td>
       <td>${log.summary}</td>
     </tr>
-  `).join("") : `<tr><td colspan="5"><div class="empty-state"><strong>No audit logs match.</strong><span>Clear filters or create a sensitive action.</span></div></td></tr>`;
+  `)}` : safeHtml`<tr><td colspan="5"><div class="empty-state"><strong>No audit logs match.</strong><span>Clear filters or create a sensitive action.</span></div></td></tr>`;
 }
 
 function applyRolePermissions() {
@@ -2640,7 +2777,8 @@ function setupExportButton() {
 
 function csvCell(value) {
   const text = value === undefined || value === null ? "" : String(value);
-  return `"${text.replaceAll('"', '""')}"`;
+  const spreadsheetSafe = /^[\t\r\n ]*[=+\-@]/.test(text) ? `'${text}` : text;
+  return `"${spreadsheetSafe.replaceAll('"', '""')}"`;
 }
 
 setupNavigation();
