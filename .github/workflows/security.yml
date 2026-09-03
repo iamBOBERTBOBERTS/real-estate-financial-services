@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: security-${{ github.workflow }}-${{ github.ref }}
@@ -48,4 +49,3 @@ jobs:
 
       - name: Reject high-severity dependency advisories
         run: npm audit --audit-level=high
-
