@@ -194,6 +194,8 @@ On **Permissions**, use **Structured Consent** before exporting packets or marki
 
 Use **Export Backup** to save a JSON backup. Treat backup files as sensitive and store them carefully.
 
+Restore accepts complete version 1 JSON backups up to 4 MB. The app checks every collection before changing local data; if a browser storage write fails, the previous local data is restored.
+
 Use **Audit Logs** as Owner or Admin to review major actions like consent changes, packet exports, handoffs, outcomes, imports, and backups.
 
 ## Important Safety Rules

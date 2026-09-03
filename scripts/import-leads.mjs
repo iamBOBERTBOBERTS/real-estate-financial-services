@@ -204,5 +204,6 @@ function toCsv(records) {
 
 function csvCell(value) {
   const text = value === undefined || value === null ? "" : String(value);
-  return `"${text.replaceAll('"', '""')}"`;
+  const spreadsheetSafe = /^[\t\r\n ]*[=+\-@]/.test(text) ? `'${text}` : text;
+  return `"${spreadsheetSafe.replaceAll('"', '""')}"`;
 }
